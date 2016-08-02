@@ -126,7 +126,7 @@ class CameraView: UIViewController, CLLocationManagerDelegate, CameraManDelegate
     layer.videoGravity = AVLayerVideoGravityResizeAspectFill
 
     view.layer.insertSublayer(layer, atIndex: 0)
-    layer.frame = view.layer.frame
+    layer.frame = view.layer.bounds
     view.clipsToBounds = true
 
     previewLayer = layer
