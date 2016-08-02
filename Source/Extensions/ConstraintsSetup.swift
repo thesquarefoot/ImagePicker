@@ -232,7 +232,7 @@ extension ImagePickerController {
 
     let landscapeRight = UIDevice.currentDevice().orientation == .LandscapeRight
 
-    for attribute: NSLayoutAttribute in [.Left, .Top, .Height] {
+    for attribute: NSLayoutAttribute in [landscapeRight ? .Right : .Left, .Top, .Height] {
       view.addConstraint(NSLayoutConstraint(item: cameraController.view, attribute: attribute,
         relatedBy: .Equal, toItem: view, attribute: attribute,
         multiplier: 1, constant: 0))
