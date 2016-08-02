@@ -110,7 +110,6 @@ class CameraView: UIViewController, CLLocationManagerDelegate, CameraManDelegate
 
   override func viewDidAppear(animated: Bool) {
     super.viewDidAppear(animated)
-    setCorrectOrientationToPreviewLayer()
     locationManager?.startUpdatingLocation()
   }
 
@@ -131,6 +130,8 @@ class CameraView: UIViewController, CLLocationManagerDelegate, CameraManDelegate
     view.clipsToBounds = true
 
     previewLayer = layer
+
+    setCorrectOrientationToPreviewLayer()
   }
 
   // MARK: - Layout
