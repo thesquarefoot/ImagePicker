@@ -130,9 +130,12 @@ extension TopView {
   }
 
   func setupCompactHeightConstraints() {
-    addConstraint(NSLayoutConstraint(item: flashButton, attribute: .Left,
-      relatedBy: .Equal, toItem: self, attribute: .Left,
-      multiplier: 1, constant: 8))
+
+    let landscapeRight = UIDevice.currentDevice().orientation == .LandscapeRight
+
+    addConstraint(NSLayoutConstraint(item: flashButton, attribute: landscapeRight ? .Right : .Left,
+      relatedBy: .Equal, toItem: self, attribute: landscapeRight ? .Right : .Left,
+        multiplier: 1, constant: landscapeRight ? -8 : 8))
 
     addConstraint(NSLayoutConstraint(item: flashButton, attribute: .Top,
       relatedBy: .Equal, toItem: self, attribute: .Top,
@@ -227,6 +230,8 @@ extension ImagePickerController {
 
   func setupCompactHeightConstraints() {
 
+    let landscapeRight = UIDevice.currentDevice().orientation == .LandscapeRight
+
     for attribute: NSLayoutAttribute in [.Left, .Top, .Height] {
       view.addConstraint(NSLayoutConstraint(item: cameraController.view, attribute: attribute,
         relatedBy: .Equal, toItem: view, attribute: attribute,
@@ -237,7 +242,7 @@ extension ImagePickerController {
       relatedBy: .Equal, toItem: view, attribute: .Width,
       multiplier: 1, constant: -BottomContainerView.Dimensions.height))
 
-    for attribute: NSLayoutAttribute in [.Top, .Right, .Height] {
+    for attribute: NSLayoutAttribute in [.Top, landscapeRight ? .Left : .Right, .Height] {
       view.addConstraint(NSLayoutConstraint(item: bottomContainer, attribute: attribute,
         relatedBy: .Equal, toItem: view, attribute: attribute,
         multiplier: 1, constant: 0))
@@ -247,7 +252,7 @@ extension ImagePickerController {
       relatedBy: .Equal, toItem: nil, attribute: .NotAnAttribute,
       multiplier: 1, constant: BottomContainerView.Dimensions.height))
 
-    for attribute: NSLayoutAttribute in [.Left, .Top, .Height] {
+    for attribute: NSLayoutAttribute in [landscapeRight ? .Right : .Left, .Top, .Height] {
       view.addConstraint(NSLayoutConstraint(item: topView, attribute: attribute,
         relatedBy: .Equal, toItem: self.view, attribute: attribute,
         multiplier: 1, constant: 0))
