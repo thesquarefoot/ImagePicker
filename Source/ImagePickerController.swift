@@ -109,6 +109,8 @@ public class ImagePickerController: UIViewController {
     super.viewWillAppear(animated)
 
     _ = try? AVAudioSession.sharedInstance().setActive(true)
+
+    self.galleryView.hidden = traitCollection.verticalSizeClass == .Compact
     setupConstraintsForAllViews(traitCollection.verticalSizeClass == .Compact)
 
     statusBarHidden = UIApplication.sharedApplication().statusBarHidden
@@ -138,6 +140,24 @@ public class ImagePickerController: UIViewController {
   public override func viewWillDisappear(animated: Bool) {
     super.viewWillDisappear(animated)
     UIApplication.sharedApplication().setStatusBarHidden(statusBarHidden, withAnimation: .Fade)
+  }
+
+  override public func viewWillTransitionToSize(size: CGSize, withTransitionCoordinator coordinator: UIViewControllerTransitionCoordinator) {
+    super.viewWillTransitionToSize(size, withTransitionCoordinator: coordinator)
+    cameraController.viewWillTransitionToSize(size, withTransitionCoordinator: coordinator)
+    coordinator.animateAlongsideTransition({ (context) in
+      self.galleryView.alpha = 0
+      self.setupConstraintsForAllViews(self.traitCollection.verticalSizeClass == .Compact)
+      }, completion: { context in
+        UIView.performWithoutAnimation() {
+          self.collapseGalleryView(nil)
+          self.galleryView.updateFrames()
+        }
+        self.galleryView.hidden = self.traitCollection.verticalSizeClass == .Compact
+        UIView.animateWithDuration(0.2) {
+          self.galleryView.alpha = 1
+        }
+      })
   }
 
   public func resetAssets() {
@@ -188,16 +208,6 @@ public class ImagePickerController: UIViewController {
     galleryView.fetchPhotos()
     galleryView.canFetchImages = false
     enableGestures(true)
-  }
-
-  public override func willTransitionToTraitCollection(newCollection: UITraitCollection, withTransitionCoordinator coordinator: UIViewControllerTransitionCoordinator) {
-    super.willTransitionToTraitCollection(newCollection, withTransitionCoordinator: coordinator)
-    coordinator.animateAlongsideTransition(
-      { context in
-        self.setupConstraintsForAllViews(newCollection.verticalSizeClass == .Compact)
-      },
-      completion: nil)
-
   }
 
   func setupConstraintsForAllViews(compactHeight: Bool) {
@@ -300,13 +310,8 @@ public class ImagePickerController: UIViewController {
   }
 
   func updateGalleryViewFrames(constant: CGFloat) {
-    if view.traitCollection.verticalSizeClass == .Compact {
-      // Don't show the gallery when we have a compact (phone landscape) height
-      galleryView.frame.size.height = 0
-    } else {
-      galleryView.frame.origin.y = totalSize.height - bottomContainer.frame.height - constant
-      galleryView.frame.size.height = constant
-    }
+    galleryView.frame.origin.y = totalSize.height - bottomContainer.frame.height - constant
+    galleryView.frame.size.height = constant
   }
 
   func enableGestures(enabled: Bool) {
@@ -473,13 +478,4 @@ extension ImagePickerController: ImageGalleryPanGestureDelegate {
     }
   }
 
-  override public func viewWillTransitionToSize(size: CGSize, withTransitionCoordinator coordinator: UIViewControllerTransitionCoordinator) {
-    super.viewWillTransitionToSize(size, withTransitionCoordinator: coordinator)
-
-    cameraController.viewWillTransitionToSize(size, withTransitionCoordinator: coordinator)
-    coordinator.animateAlongsideTransition({ (context) in
-      self.collapseGalleryView(nil)
-      self.galleryView.updateFrames()
-      }, completion: nil)
-  }
 }
